@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import useDebounce from './useDebounce';
 import './App.css';
 
 function App() {
   const [domainName, setDomainName] = useState('');
   const [dnsResponses, setDnsResponses] = useState({});
+  const debouncedDomainName = useDebounce(domainName, 300);
 
   const handleResolve = async (type) => {
     try {
@@ -18,11 +20,24 @@ function App() {
     }
   };
 
-  const handleClick = async () => {
-    const types = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT'];
-    const requests = types.map(type => handleResolve(type));
-    await Promise.all(requests);
+  const handleClick = async (event) => {
+    event.preventDefault();
+    if (isValidDomain(domainName)) {
+      const types = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT'];
+      const requests = types.map(type => handleResolve(type));
+      await Promise.all(requests);
+    }
   };
+
+  const isValidDomain = (domain) => {
+    return domain.includes('.') && domain.split('.').every(part => part.length > 0);
+  };
+
+  useEffect(() => {
+    if (isValidDomain(debouncedDomainName)) {
+      handleClick({ preventDefault: () => {} });
+    }
+  }, [debouncedDomainName]);
 
   const formatDnsResponse = (data) => {
     if (!data) return [];
@@ -72,7 +87,7 @@ function App() {
   return (
     <div className="App">
       <h1>DNS Resolver</h1>
-      <div className="input-container">
+      <form onSubmit={handleClick} className="input-container">
         <input
           type="text"
           value={domainName}
@@ -80,8 +95,10 @@ function App() {
           placeholder="Enter a domain name"
           className="input-field"
         />
-        <button onClick={handleClick} className="resolve-button">Resolve DNS</button>
-      </div>
+        <button type="submit" className="resolve-button">
+          Resolve DNS
+        </button>
+      </form>
       {renderDnsTable()}
     </div>
   );
