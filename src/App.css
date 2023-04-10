@@ -1,38 +1,68 @@
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: 'Roboto', sans-serif;
+  margin-top: 2rem;
+  max-width: 90%;
+  margin: 2rem auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-bottom: 2rem;
+}
+
+.input-field {
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  flex-grow: 1;
+}
+
+.resolve-button {
+  font-size: 1.2rem;
+  background-color: #4CAF50;
   color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.resolve-button:hover {
+  background-color: #3e8e41;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.dns-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.dns-table th, .dns-table td {
+  text-align: left;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+}
+
+.dns-table th {
+  background-color: #f2f2f2;
+}
+
+.dns-table tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
