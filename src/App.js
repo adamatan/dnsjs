@@ -20,6 +20,13 @@ function App() {
     }
   };
 
+  const hasSpfRecord = () => {
+    const txtRecords = dnsResponses['TXT'] && dnsResponses['TXT'].Answer;
+    if (!txtRecords) return false;
+
+    return txtRecords.some(record => record.data.startsWith('v=spf1'));
+  };
+
   const handleClick = async (event) => {
     event.preventDefault();
     if (isValidDomain(domainName)) {
@@ -100,6 +107,11 @@ function App() {
         </button>
       </form>
       {renderDnsTable()}
+      {hasSpfRecord() && (
+        <p className="spf-message">
+          This site uses SPF (Sender Policy Framework) for email authentication.
+        </p>
+      )}
     </div>
   );
 }
