@@ -1,11 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import useDebounce from './useDebounce';
 import './App.css';
 
 function App() {
-  const [domainName, setDomainName] = useState('');
+  const getRandomDomain = () => {
+    const domains = [
+      'apple.com',
+      'amazon.com',
+      'microsoft.com',
+      'alphabet.com',
+      'facebook.com',
+      'tesla.com',
+      'nvidia.com',
+      'paypal.com',
+      'netflix.com',
+      'salesforce.com',
+      'walmart.com',
+      'berkshirehathaway.com',
+      'jpmorganchase.com',
+      'johnsonandjohnson.com',
+      'visa.com',
+      'mastercard.com',
+      'procterandgamble.com',
+      'unitedhealthgroup.com',
+      'home-depot.com',
+      'intel.com',
+      'verizon.com',
+      'att.com',
+      'cisco.com',
+      'abbott.com',
+      'disney.com',
+      'comcast.com',
+      'boeing.com',
+      'cocacola.com',
+      'pepsico.com',
+      'pfizer.com',
+      'merck.com',
+      'abbvie.com',
+      'eli-lilly.com',
+      'amgen.com',
+      'bristol-myers-squibb.com',
+      'gilead.com',
+      'goldmansachs.com',
+      'lockheedmartin.com',
+      '3m.com',
+      'caterpillar.com',
+      'exxonmobil.com',
+      'chevron.com',
+      'generalelectric.com',
+      'honeywell.com',
+      'dupont.com',
+      'ibm.com',
+      'oracle.com',
+      'dow.com',
+      'fedex.com',
+      'ups.com',
+    ];
+
+    const randomIndex = Math.floor(Math.random() * domains.length);
+    return domains[randomIndex];
+  };
+
+  const [domainName, setDomainName] = useState(getRandomDomain());
   const [dnsResponses, setDnsResponses] = useState({});
-  const debouncedDomainName = useDebounce(domainName, 300);
+
+  useEffect(() => {
+    if (domainName) {
+      handleClick();
+    }
+  }, []);
+
+  const hasSpfRecord = (dnsResponses) => {
+    const txtRecords = dnsResponses.TXT?.Answer || [];
+    return txtRecords.some((record) => record.data.startsWith('v=spf1'));
+  };
+
 
   const handleResolve = async (type) => {
     try {
@@ -20,31 +88,11 @@ function App() {
     }
   };
 
-  const hasSpfRecord = () => {
-    const txtRecords = dnsResponses['TXT'] && dnsResponses['TXT'].Answer;
-    if (!txtRecords) return false;
-
-    return txtRecords.some(record => record.data.startsWith('v=spf1'));
+  const handleClick = async () => {
+    const types = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT'];
+    const requests = types.map(type => handleResolve(type));
+    await Promise.all(requests);
   };
-
-  const handleClick = async (event) => {
-    event.preventDefault();
-    if (isValidDomain(domainName)) {
-      const types = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT'];
-      const requests = types.map(type => handleResolve(type));
-      await Promise.all(requests);
-    }
-  };
-
-  const isValidDomain = (domain) => {
-    return domain.includes('.') && domain.split('.').every(part => part.length > 0);
-  };
-
-  useEffect(() => {
-    if (isValidDomain(debouncedDomainName)) {
-      handleClick({ preventDefault: () => {} });
-    }
-  }, [debouncedDomainName]);
 
   const formatDnsResponse = (data) => {
     if (!data) return [];
@@ -91,26 +139,27 @@ function App() {
     );
   };
 
+  const handleInputClick = () => {
+    setDomainName('');
+  };
+
   return (
     <div className="App">
       <h1>DNS Resolver</h1>
-      <form onSubmit={handleClick} className="input-container">
+      <div className="input-container">
         <input
           type="text"
           value={domainName}
+          onClick={handleInputClick}
           onChange={(e) => setDomainName(e.target.value)}
           placeholder="Enter a domain name"
           className="input-field"
         />
-        <button type="submit" className="resolve-button">
-          Resolve DNS
-        </button>
-      </form>
+        <button onClick={handleClick} className="resolve-button">Resolve DNS</button>
+      </div>
       {renderDnsTable()}
-      {hasSpfRecord() && (
-        <p className="spf-message">
-          This site uses SPF (Sender Policy Framework) for email authentication.
-        </p>
+      {hasSpfRecord(dnsResponses) && (
+        <p className="spf-message">This site uses SPF (Sender Policy Framework).</p>
       )}
     </div>
   );
