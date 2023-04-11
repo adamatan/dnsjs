@@ -28,8 +28,22 @@ function App() {
   );
 
   const handleClick = useCallback(async () => {
-    const types = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'SOA', 'TXT'];
-    const requests = types.map((type) => handleResolve(type));
+    const recordTypes = [
+      'A',        'NS',         'MD',    'MF',
+      'CNAME',    'SOA',        'MB',    'MG',
+      'MR',       'NULL',       'WKS',   'PTR',
+      'HINFO',    'MINFO',      'MX',    'TXT',
+      'RP',       'SIG',        'KEY',   'AAAA',
+      'SRV',      'NAPTR',      'CERT',  'A6',
+      'DNAME',    'OPT',        'DS',    'SSHFP',
+      'IPSECKEY', 'RRSIG',      'NSEC',  'DNSKEY',
+      'NSEC3',    'NSEC3PARAM', 'TLSA',  'CDS',
+      'CDNSKEY',  'SVCB',       'HTTPS', 'SPF',
+      'TSIG',     'IXFR',       'AXFR',  'MAILB',
+      'CAA'
+    ];
+
+    const requests = recordTypes.map((type) => handleResolve(type));
     await Promise.all(requests);
   }, [handleResolve]);
 
