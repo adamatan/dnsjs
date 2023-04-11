@@ -68,8 +68,11 @@ function App() {
       {hasSpfRecord(dnsResponses) && (
         <p className="spf-message">This site uses SPF (Sender Policy Framework).</p>
       )}
+      <div className="commit-hash">
+        <small>Commit hash: {process.env.REACT_APP_COMMIT_HASH}</small>
+      </div>
     </div>
   );
-}
+  }
 
 export default App;
